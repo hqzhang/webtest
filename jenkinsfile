@@ -1,0 +1,70 @@
+pipeline {
+    agent any
+    environment {
+    	PATH = "/usr/local/bin:/Applications/Docker.app/Contents/Resources/bin:/usr/local/Cellar/maven/3.5.3/libexec/bin:$PATH"
+    	DOCKER_HOST='tcp://localhost:2376'
+        IP='localhost'
+        APP="wavecloud/mynginx-app"
+        name="mynginx-app"
+        KEY_FILE="image/wavecloud.key"
+        CERT_FILE="image/wavecloud.crt"
+        CERT_NAME="mytlskey"
+        HOST="www.wavecloud.com"
+    }
+    stages {
+        stage('Download Repo...') {
+            steps {
+                sh 'sudo docker ps'
+                sh 'rm -rf *.* * .git'
+                sh "git clone 'https://github.com/webtest' . "
+                sh "ls -al"
+            }
+            
+        }
+    
+        stage('Build and Push image...') {
+            steps {
+                echo "generate cert and key"
+                sh "openssl req -x509 -nodes -days 365 -newkey rsa:2048 -out ${CERT_FILE} -keyout ${KEY_FILE} \
+       -subj '/C=CA/ST=Ontario/L=Ottawa/O=WaveCloud Inc./OU=IT/CN=${HOST}' "
+
+                echo "build docker image"
+                sh 'sudo docker build -f image/Dockerfile -t wavecloud/mynginx-app  image '
+
+                echo "push and remove docker images"
+                //sh "sudo docker login -uzhanghongqi -p${passwd} "
+                sh "sudo docker push wavecloud/mynginx-app "
+            }
+            
+        }
+        stage('Create Cloud...') {
+            steps {
+              echo 'Cloud Deploying....'
+                sh '/usr/local/bin/terraform destroy <<< "yes" '
+                sh " /usr/local/bin/terraform get  "
+                sh " /usr/local/bin/terraform plan "
+                sh " /usr/local/bin/terraform apply "
+            }
+            
+        }
+        stage('Configure Cloud...') {
+            steps {
+                echo 'Cloud Configuration....'
+                sh 'ansible all -m ping'
+                sh 'ansible-playbook -v mybook.yml'
+        
+            }
+            
+        }
+        stage('Testing...') {
+            steps {
+                echo 'config hosts and curl url......'
+                sh  'sleep 30 '
+                sh 'curl -Lk https://www.wavecloud.com '
+                
+            }
+            
+        }
+    }
+}
+

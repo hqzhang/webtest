@@ -1,0 +1,20 @@
+- name: Configure VM
+  hosts: all
+  gather_facts: True
+  tasks:
+#   - name: yum check-update
+#     shell: 'yum check-update'
+#     sudo: yes
+   - name:  download/install docker
+     shell: 'curl -fsSL https://get.docker.com/ | sh'
+     sudo: yes
+   - name: restart docker
+     shell: 'sudo systemctl restart docker'
+     sudo: yes
+   - name: clean web container
+     shell: docker rm -f docker-web
+     sudo: yes
+     ignore_errors: yes
+   - name: running web container
+     shell: 'docker run --name docker-web -p 9898:80 -p 443:443 -d wavecloud/mynginx-app'
+     sudo: yes                                                                

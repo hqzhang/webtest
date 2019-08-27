@@ -1,0 +1,47 @@
+#!/bin/bash
+ source ~/.rc
+ set -x
+ APP=wavecloud/mynginx-app
+ #port=80
+ #fport=9898
+ name=mynginx-app
+ KEY_FILE=image/wavecloud.key
+ CERT_FILE=image/wavecloud.crt
+ CERT_NAME=mytlskey
+ HOST=www.wavecloud.com
+ 
+ echo "generate cert and key"
+ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -out ${CERT_FILE} -keyout ${KEY_FILE} \
+       -subj "/C=CA/ST=Ontario/L=Ottawa/O=WaveCloud Inc./OU=IT/CN=${HOST}"
+
+ echo "build docker image"
+ docker build -f image/Dockerfile -t $APP image
+
+ echo "push and remove docker images"
+ set +x
+ docker login -uzhanghongqi -p${passwd}
+ set -x
+ docker push $APP
+
+ echo 'Cloud Deploying....'
+ terraform destroy <<< "yes"
+ terraform get;terraform plan;terraform apply
+ sleep 60;
+ 
+ echo 'Config Cloud ....'
+ ansible-playbook -v mybook.yml
+
+ sleep 15 
+
+ echo 'Verification... '
+ ip=$(./plugins/inventory/terraform.py --hostfile|grep control|cut -f1)
+ sudo sed -i -e "/www.wavecloud.com/ s/^.* www.wavecloud.com/$ip www.wavecloud.com/" /etc/hosts 
+ res='Silkom'
+ result=$(curl -Lk https://www.wavecloud.com | grep $res)
+
+ if [[ '' != $result ]]; 
+ then echo "TEST PASS!"
+ else echo "TEST ERROR!"
+ fi
+ 
+ #terraform destroy <<< "yes"
