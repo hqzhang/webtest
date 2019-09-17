@@ -15,8 +15,9 @@ pipeline {
         stage('Download Repo...') {
             steps {
                 sh 'sudo docker ps'
-                sh 'rm -rf *.* * .git'
-                sh "git clone 'https://github.com/webtest' . "
+                //sh 'rm -rf *.* * .git'
+                checkout scm
+                //sh "git clone 'https://github.com/webtest' . "
                 sh "ls -al"
             }
             
@@ -37,6 +38,7 @@ pipeline {
             }
             
         }
+        /*
         stage('Create Cloud...') {
             steps {
               echo 'Cloud Deploying....'
@@ -64,7 +66,7 @@ pipeline {
                 
             }
             
-        }
+        }*/
     }
 }
 
