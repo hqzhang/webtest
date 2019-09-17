@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+        docker { image 'node:7-alpine' }
+    }
     environment {
     	PATH = "/usr/local/bin:/Applications/Docker.app/Contents/Resources/bin:/usr/local/Cellar/maven/3.5.3/libexec/bin:$PATH"
     	DOCKER_HOST='tcp://localhost:2376'
@@ -14,6 +16,7 @@ pipeline {
     stages {
         stage('Download Repo...') {
             steps {
+                sh 'node --version
                 sh 'pwd'
                 //sh 'rm -rf *.* * .git'
                 //checkout scm
