@@ -1,7 +1,5 @@
 pipeline {
-    agent {
-        docker { image 'node:7-alpine' }
-    }
+   
     environment {
     	PATH = "/usr/local/bin:/Applications/Docker.app/Contents/Resources/bin:/usr/local/Cellar/maven/3.5.3/libexec/bin:$PATH"
     	DOCKER_HOST='tcp://localhost:2376'
@@ -12,6 +10,9 @@ pipeline {
         CERT_FILE="image/wavecloud.crt"
         CERT_NAME="mytlskey"
         HOST="www.wavecloud.com"
+    }
+    agent {
+        docker { image 'node:7-alpine' }
     }
     stages {
         stage('Download Repo...') {
