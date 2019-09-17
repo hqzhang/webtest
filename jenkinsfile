@@ -14,15 +14,15 @@ pipeline {
     stages {
         stage('Download Repo...') {
             steps {
-                sh 'sudo docker ps'
+                sh 'pwd'
                 //sh 'rm -rf *.* * .git'
-                checkout scm
+                //checkout scm
                 //sh "git clone 'https://github.com/webtest' . "
                 sh "ls -al"
             }
             
         }
-    
+    /*
         stage('Build and Push image...') {
             steps {
                 echo "generate cert and key"
@@ -38,7 +38,7 @@ pipeline {
             }
             
         }
-        /*
+        
         stage('Create Cloud...') {
             steps {
               echo 'Cloud Deploying....'
