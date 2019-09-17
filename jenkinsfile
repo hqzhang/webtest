@@ -16,7 +16,7 @@ pipeline {
     stages {
         stage('Download Repo...') {
             steps {
-                sh 'node --version
+                sh 'node --version'
                 sh 'pwd'
                 //sh 'rm -rf *.* * .git'
                 //checkout scm
