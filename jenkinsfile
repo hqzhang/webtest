@@ -26,7 +26,7 @@ pipeline {
             }
             
         }
-    /*
+    
         stage('Build and Push image...') {
             steps {
                 echo "generate cert and key"
@@ -70,7 +70,7 @@ pipeline {
                 
             }
             
-        }*/
+        }
     }
 }
 
